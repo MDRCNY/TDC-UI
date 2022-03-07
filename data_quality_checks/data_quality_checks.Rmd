@@ -1,0 +1,957 @@
+---
+title: 'Checking UI data'
+author: "TDC Team + Dannia Guzman + Zarni Htet"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+always_allow_html: yes
+---
+# Project Documentation Block. 
+
+### Libraries and Functions needed
+
+This is merely a set up, but this need to be __loaded before__ we can dynamically add in the project start date quarter etc.
+
+* An R library is a collection of functions written by other developers and approved by the open source community for wider usage.
+* The function _source()_ allows us to import our custom written functions. The custom functions are written and saved as .R files.   
+* When you are ready to use this R Markdown, you will need to insert the correct file paths in your 
+environment where prompted in the code chunk below.
+
+```{r documentationBlock, warning = FALSE, message = FALSE}
+# This is to prevent scientific notations such as "^" to not show up on output displays
+options(scipen = 999) 
+# Loading R packages. 
+# NOTE: You will need to install.packages if you don't have these. e.g.: install.packages("tidyverse")
+
+# For data processing
+library(tidyverse) 
+# For quick cleaning of variable names
+library(janitor)   
+# For nice looking table output for Word document format
+library(flextable) 
+# For formatting dollar values
+library(scales)   
+# For exploring missingness in data
+library(naniar)
+
+#enter project name
+project <-"TDC"
+
+#enter project description
+projdesc <-"a project designed to promote better use of TANF and UI data"
+
+#enter first quarter expected
+firstq <-"Q1, 2017"
+
+#enter last quarter expected
+lastq <-"Q2, 2017"
+
+#enter the purpose of the program
+
+purp1 <-"resolves QC issues in a UI wage data file received in July 2017. 
+This file contains data from Q1 and Q2 2017. 
+The program then combines this file with an earlier processed data file 
+from April 2017, which includes incomplete data from Q1 2017. "
+purp2 <-"This example uses synthetic UI data created for instructional purposes. "
+purp3 <-"Please report any bugs and share any improvements by emailing richard.hendra@mdrc.org" 
+
+#enter the number of people for whom UI data were requested
+request <- 190
+
+#record an expectation about the match rate (best guess is fine)
+expectedmatch <- 40
+
+# Loading custom R functions
+# The file "functions.R" can be downloaded from the TDC-UI GitHub under the data_quality_checks_folder
+# Insert the file path to the folder where the file "functions.R" is saved in your environment:
+source("/yourdirectory/functions.R")
+
+# Directory 
+# Insert the file path to the folder where the UI wage records data are stored in your environment:
+usedir1 <- "/yourdirectory/"
+
+# Data
+# This is a list of the data files we will be using in the program.
+# Both of these files can be downloaded from the TDC-UI GitHub under the data_quality_checks_folder
+# An .RDA is an R data object that can store multiple data sets. 
+# it's similar to csv, but will preserve data types such as Date, factor() etc.
+
+usefile1 <-"uidata1_april.rda" # Old data file
+usefile2 <-"uidata1_july.rda"  # Updated data file
+
+# Output directory
+# Insert the file path where you would like to save your output in your environment:
+savdir1 <- "/yourdirectory/"
+
+# Output data
+savfile1 <- "updated_ui_data.rda"
+```
+
+### Reading in the data
+
+```{r readInData, warning = FALSE, message = FALSE}
+# This is the old data file submitted in April 2017. 
+load(file.path(usedir1,usefile1)) 
+# This is the new data file submitted in June 2017.
+load(file.path(usedir1,usefile2)) 
+```
+
+### Standardize the column names
+
+Data file column names come in all forms. Some are capitalized. Some have spaces. Some could accidentally have special characters like ".$*"/. The _clean name_ function below removes those special characters and return lowercase variable names consisting only have _, letters and numbers. It's a simple function to tidy up your variable names for aesthetic as well as ease of use as we pipe variable names through the R "Tidy framework" for data processing later on. This can help you to get ahead of problems when you merge or stack files (as is common practice with administrative data),  
+
+```{r stdColumnNames01, warning = FALSE, message = FALSE}
+# Checking current column names of both data sets
+names(uidata1_april)
+names(uidata1_july)  
+```
+
+```{r stdColumnNames02, warning = FALSE, message = FALSE}
+# Cleaning column names of both data sets
+uidata1_april <- 
+  janitor::clean_names(uidata1_april)
+uidata1_july <-
+  janitor::clean_names(uidata1_july)
+```
+
+```{r stdColumnNames03, warning = FALSE, message = FALSE}
+# Rechecking column names of both data sets
+names(uidata1_april)
+names(uidata1_july)
+```
+
+
+What follows is an example of how to use R markdown to automatically write a memo.
+
+__`r project`__ is `r projdesc`  
+
+This memo discusses the UI wage data updates received on __`r max(as.Date(uidata1_july$submission_date, '%m/%d/%Y'))`__ that covers __`r firstq`__ through __`r lastq`__.   
+
+This program:  
+
+`r purp1` and 
+`r purp2` `r purp3`  
+
+# Record Counts and Sums on the New File  
+
+Record counts: There are __`r dim(uidata1_july)[1]`__ records and __`r length(unique(uidata1_july$ssn))`__ unique SSNs in the returned data file of the __`r request`__ records requested for match. __`r  round(100*(length(unique(uidata1_july$ssn)))/request,2)`__ percent of the SSNs matched to the UI file compared to the expected value of __`r expectedmatch`__ percent. The earnings on this file total is __`r dollar(round(sum(uidata1_july$earnings, na.rm = TRUE),2))`__.   
+
+### uidata1_july (new file)  
+
+```{r metaData, warning = FALSE, message = FALSE}
+# using the var.describe meta data function written by 
+# Kristin Porter, MDRC: this creates meta data for each variable (think of it as a codebook)
+# map is an intermediate level R function 
+# that applies the function var.describe to each column of the uidat1_july data frame.
+each_var_des <- purrr::map(.x = uidata1_july,.f = var.describe, missVals = NULL) 
+# combine meta data of each variable/column into a single data frame
+all_var_des <- do.call(rbind,each_var_des)
+# Vector to store the column names of the data set 
+# as var.describe() does not have that built-in feature
+all_var_des$Variable <- names(uidata1_july) 
+# Setting Variable column to the front of the table
+all_var_des <-
+all_var_des %>%
+  dplyr::relocate(Variable, .before = NumUnique)
+# Wrap the data frame with flex table for nice output in Word document
+flextable::flextable(all_var_des) %>%
+  theme_zebra() %>% # stripe themes
+  autofit() # adjustable column width
+```
+
+```{r uidata1JulyRecords, warning = FALSE, message = FALSE}
+# record counts
+rawJulyRecords <- dim(uidata1_july)[1]
+print(rawJulyRecords)
+```
+
+```{r uidata1JulySsnUnique, warning = FALSE, message = FALSE}
+# identifying number of unique ssns
+rawJulySSNCounts <- length(unique(uidata1_july$ssn))
+print(rawJulySSNCounts)
+```
+
+```{r uidata1JulyTotalEarnings, warning = FALSE, message = FALSE}
+# calculating the total earnings amount
+rawJulyEarnings <- sum(uidata1_july$earnings, na.rm = TRUE)
+print(rawJulyEarnings)
+```
+
+```{r rawJulyCountSum, warning = FALSE, message =  FALSE}
+# storing all the raw counts, ssn values and total earnings for check table later on.
+rawJulyCountSum <- c(rawJulyRecords, rawJulySSNCounts, rawJulyEarnings)
+print(rawJulyEarnings)
+```
+
+# Missing or incomplete data
+
+## Spread of records per quarter
+
+It useful to check whether missing data occur more often than expected in some quarters than in others, outside of typical economic trends (e.g., typically there is an uptick in the fourth quarter of each year as the demand for retail workers increases). If certain quarters experience more missing data than others (outside of economic trends), there might be an underlying data quality issue. Note that the most recent quarter or two on a data extraction will likely have fewer records since there is typically a lag between employers reporting wage data for the quarter and statewide earnings data being available for us. 
+
+Our simulated data only contains two quarters of data and does not have any missingness, but real data may be messier. The checks below can be useful to assess missingness and the spread of records by quarter across longer timespans in real data.
+```{r}
+#check the number and percentage of missing records for each variable
+miss_var_summary(uidata1_july)
+
+#This plot shows the number of records (n) that exist for each quarter of data
+uidata1_july %>% 
+  count(quarter) %>% 
+  mutate(quarter = as_factor(quarter)) %>% #this keeps retains the current order for the x-axis.
+  ggplot(mapping = aes(x = quarter, y = n)) + geom_bar(stat = "identity") +
+  ylab("Number of records") + xlab("Quarter") #this modifies the plot labels
+
+#with more quarters of data, a line graph could be more effective
+uidata1_july %>% 
+  count(quarter) %>% 
+  mutate(quarter = as_factor(quarter)) %>% 
+  ggplot(mapping = aes(x = quarter, y = n, group = 1)) + geom_line() +
+  ylab("Number of records") + xlab("Quarter") 
+
+#This plot shows the percent of missings in each variable, broken down by a 
+#categorical variable in the dataset (here, we use quarters).
+#This can help you see whether missingness occurs in certain quarters and for certain variables
+gg_miss_fct(x = uidata1_july, fct = quarter)
+```
+
+## Mean earnings by quarter
+```{r}
+uidata1_july %>% 
+  group_by(quarter) %>% 
+  summarize(mean_earnings = mean(earnings)) %>% 
+  ggplot(mapping = aes(x = quarter, y = mean_earnings, group = 1)) + geom_line() 
+```
+
+
+## Does missing data occur systematically, such as by earnings amount? 
+
+Some states may not return data for earnings under a certain threshold (such as $500/quarter), so individuals with low earnings in a particular quarter may not show up on the file. 
+
+```{r}
+#check the range of the earnings amount, with particular attention to the minimum value. Are there any earnings under 500? 
+summary(uidata1_july$earnings)
+
+#summary table of number of records by earning category per quarter
+uidata1_july %>% 
+  group_by(quarter) %>% 
+  summarise(
+    earn_lt_500 = sum(earnings < 500),
+    earn_lt_5k = sum(earnings < 5000), 
+    earn_5k_10k = sum(earnings >= 5000 & earnings < 9999), 
+    earn_10k_15k = sum(earnings >= 10000 & earnings < 14999), 
+    earn_15k_20k = sum(earnings >= 15000 & earnings < 19999), 
+    earn_20k_25k = sum(earnings >= 20000 & earnings < 24999), 
+    earn_25k_30k = sum(earnings >= 25000 & earnings < 29999),
+    earn_gt_30k = sum(earnings >= 30000)) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+
+#bar graph of number of records by earning category (across all quarters)
+uidata1_july %>% 
+  summarise(
+    earn_lt_500 = sum(earnings < 500),
+    earn_lt_5k = sum(earnings < 5000), 
+    earn_5k_10k = sum(earnings >= 5000 & earnings < 9999), 
+    earn_10k_15k = sum(earnings >= 10000 & earnings < 14999), 
+    earn_15k_20k = sum(earnings >= 15000 & earnings < 19999), 
+    earn_20k_25k = sum(earnings >= 20000 & earnings < 24999), 
+    earn_25k_30k = sum(earnings >= 25000 & earnings < 29999),
+    earn_gt_30k = sum(earnings >= 30000)) %>% 
+  pivot_longer(everything(), names_to = "earn_cat", values_to = "n_records") %>% 
+  mutate(earn_cat = as_factor(earn_cat)) %>% 
+  ggplot(mapping = aes(x = earn_cat, y = n_records)) + geom_bar(stat = "identity")
+  
+```
+
+
+# Duplicates
+
+## Exact Duplicates
+
+There are __`r sum(duplicated(uidata1_july))`__ exact duplicates. An exact duplicate means 2 or more records with all variables on the file – in this case, identical SSN, quarter, employer ID, earnings, and submission date – in the file as shown in the table below. If there are exact duplicates, you will want to remove them. If the file has more than a few exact duplicates, you may want to check with the data provider for the source of these exact duplicates.  
+
+```{r exactDuplicateDetection, warning = FALSE, message = FALSE}
+# Checking for exact duplicate detection
+uidata1_july_dups <- 
+uidata1_july %>%
+  # select all the columns
+  dplyr::group_by_all() %>% 
+  # sort all the columns in ascending order
+  dplyr::arrange(ssn, empid, quarter, earnings, submission_date) %>%
+  # count how many duplicates per row. 
+  # dup = 1 means a single observation. n > 1 means multiple same observation.
+  dplyr::mutate(dup = n()) %>%
+  # Only show those observations with duplicates
+  dplyr::filter(dup > 1)  
+# code to wrap it into a table using the flextable package 
+# and zebra theme with autofit() auto adjusting width of the columns
+theme_zebra(flextable(head(uidata1_july_dups, n = nrow(uidata1_july_dups)))) %>%
+  flextable::autofit() 
+```
+
+```{r exactDuplicateCount, warning = FALSE, message = FALSE}
+# Checking for the number of exact duplicate pairs across all columns
+sum(duplicated(uidata1_july))
+```
+
+```{r exactDuplicateRemoval, warning = FALSE, message = FALSE}
+# Resolving exact duplicates by removing them
+uidata1_july <-
+  uidata1_july %>%
+  dplyr::group_by_all() %>%
+  dplyr::arrange(ssn, empid, quarter, earnings, submission_date) %>%
+  # removes duplicates by only selecting the distinct ones
+  dplyr::distinct() %>% 
+  ungroup() # data is ungrouped to its normal 
+# flat structure so that we can continue manipulating at the observation level
+```
+
+We should now check to ensure all of the exact duplicates are removed. After the removal procedure, there are `r sum(duplicated(uidata1_july))` exact duplicates. We have removed 5 records with an earnings total of $24,812. Note that this comment is hardcoded. Try to automate the message!       
+
+```{r checkDuplicateRemoval01, warning = FALSE, message = FALSE}
+# Checking duplicate Removal
+sum(duplicated(uidata1_july))
+```
+
+## Partial Duplicates
+
+Partial duplicates observations are the same on nearly all columns, but different in 1 or more columns. In the example below, we are checking partial duplicates where the observations have the same SSN, employerID, quarter and submission_date, but differ in earnings. There are __`r sum(duplicated(uidata1_july[c("ssn", "empid", "quarter", "submission_date")]))`__ such partial duplicates in this newly returned file. You may be interested in a assessing variety of partial duplicates, depending on what fields are included in the returned file. With UI earnings data, some common checks might include:
+
+* Same SSN, Employer ID, Quarter, NAICS code, different earnings amount 
+* Same SSN, Quarter, NAICS code, earnings, different Employer ID 
+* Same SSN, Quarter, Employer ID, earnings amount, different NAICS code
+
+In our example here, we are looking at partial duplicates where the observations share the same SSN, employer ID, and quarter, but have different earnings amount.  
+
+```{r checkingPartialDuplicatesDetection, warning = FALSE, message = FALSE}
+# Checking for partial duplicates with difference in earnings
+uidata1_july_dups <- 
+uidata1_july %>%
+  # expecting earnings to be different so we drop it out of the grouping
+  dplyr::group_by(ssn, empid, quarter, submission_date) %>% 
+  dplyr::arrange(ssn, empid, quarter, submission_date)%>%
+  dplyr::mutate(dup = n()) %>%
+  dplyr::filter(dup > 1)
+theme_zebra(flextable(head(uidata1_july_dups, n = nrow(uidata1_july_dups)))) %>%
+  autofit()
+```
+
+
+```{r partialDuplicateCount, warning = FALSE, message = FALSE}
+# Checking for the number of partial duplication across all columns
+sum(duplicated(uidata1_july[c("ssn", "empid", "quarter", "submission_date")]))
+```
+
+After detecting for these types of partial duplicates, you will need to make a decision about how to deal with these duplicates. Upon further investigation or discussion with the UI agency, you may decide that the partial duplicates are all valid earnings records, so you will sum the earnings. Alternately, you may think that duplicated earnings are errors and make a decision to remove one of the records – either by randomly selecting one to keep, or to keeping the higher amount, etc. There are a variety of reasonable decisions you can make to resolve this issue. In this example, we’ve decided to keep the higher earnings value and remove the lower one.
+
+```{r partialDuplicateRemoval, warning = FALSE, message = FALSE}
+# Resolving partial duplicates
+uidata1_july <-
+  uidata1_july %>%
+  dplyr::group_by(ssn, empid, quarter, submission_date) %>%
+  dplyr::summarise(earnings = max(earnings, na.rm = TRUE)) %>% 
+  # decision to keep the larger earning for partial duplicates
+  dplyr::ungroup()
+```
+
+```{r partialDuplicateCheck, warning = FALSE, message = FALSE}
+# Checking for the number of partial duplication across selected columns.  
+# We removed 5 records with an earnings total of $24,812. 
+# This note could be automated as well. 
+# It turns out the simulation had partial dups and
+# it was the exact same set as above. In a real life situation this probably would not happen!
+sum(duplicated(uidata1_july[c("ssn", "empid", "quarter", "submission_date")]))
+```
+
+```{r dropCounter01, warning = FALSE, message = FALSE}
+# Keeping track of all the records that have been dropped throughout the process flow
+dropRecords <- dim(uidata1_july)[1] - rawJulyRecords
+dropSSNs <- length(unique(uidata1_july$ssn)) - rawJulySSNCounts 
+dropEarnings <- sum(uidata1_july$earnings, na.rm = TRUE) - rawJulyEarnings
+```
+
+# Outliers
+
+Per quarterly record: In 2017Q1, there are __`r nrow(uidata1_july %>% dplyr::filter(quarter == "Q12017" & earnings > 20000))`__ records of earnings amount that is greater than `r scales::dollar(20000)`  or __`r round(100 * nrow(uidata1_july %>% dplyr::filter(quarter == "Q12017" & earnings > 20000))/nrow(uidata1_july %>% dplyr::filter(quarter == "Q12017")),2)`__ percent of all earnings for that quarter in the file. There are __`r nrow(uidata1_july %>% dplyr::filter(quarter == "Q12017" & earnings > 20000))`__ records of earnings below `r scales::dollar(20)` or __`r round(100 * nrow(uidata1_july %>% dplyr::filter(quarter == "Q12017" & earnings < 20))/nrow(uidata1_july %>% dplyr::filter(quarter == "Q12017")),2)`__ percent of all earnings for that quarter in the file. In 2017Q2, there are __`r nrow(uidata1_july %>% dplyr::filter(quarter == "Q22017" & earnings > 20000))`__ records of earnings amount that is greater than `r scales::dollar(20000)` or __`r round(100 * nrow(uidata1_july %>% dplyr::filter(quarter == "Q22017" & earnings > 20000))/nrow(uidata1_july %>% dplyr::filter(quarter == "Q22017")),2)`__  percent of all earnings in file for that quarter.
+
+There are two types of outliers: extreme outliers and fringe outliers. Extreme outliers are outliers that are almost certainly errors because they are so unreasonably high. In our example below, in 2017Q1, `r scales:::dollar(500000)` is an extreme outlier because it is highly unlikely that anyone in your caseload was making an equivalent of $2 million a year. A fringe outlier (aka a "fringelier) is an unusually high, but not impossible amount. It is possible that some of the higher earners achieve such high earnings, but you may want to top code these so that the high earners do not skew your analyses too much. There are several ways to deal with outliers. One way is to impute a maximum value which is called top coding. Another is to replace with values from neighboring quarters if we have a longitudinal data set. We used both approaches in the examples below.
+
+## Outlier Detection
+
+A boxplot is a quick visual way to detect the distribution of your data as well as identify any outliers.
+In the boxplot right below, we are seeing cases of extreme outliers which are represented by dots. A normal boxplot would have a box figure which is represents a range of value from the 1st quartile of the data (25th percentile) to the 3rd quartile of the data (75th percentile). Due to the influence of the outliers, that 1st to 3rd quartile (called the interquartle range) is squashed into a single darkened line on the X-axis.
+
+```{r outlierGraph01, warning = FALSE, message = FALSE}
+uidata1_july_outlier_graph <-
+  uidata1_july %>% 
+  # filtering in case there are missing values
+  dplyr::filter(!is.na(earnings)) %>% 
+  # displaying by quarter
+  ggplot(aes(x = quarter, y = earnings)) + 
+  geom_boxplot() + 
+  xlab ("Quarters") +
+  ylab ("Earnings") +
+  ggtitle ("Distributions of quarterly earnings amounts") +
+    theme (plot.title = element_text(size = 12,
+                                     face = "bold",
+                                     vjust = 1,
+                                     hjust = 0.5))
+print(uidata1_july_outlier_graph)
+```
+
+The table below looks at earning outlier observations who have more than $20,000 with the earnings distribution in perspective by quarter. The outlier values are many times that of mean and median earnings.
+
+```{r outlierSummary01, warning = FALSE, message = FALSE}
+uidata_july_outlier <-
+uidata1_july %>%
+  # grouping by quarter
+  dplyr::group_by(quarter) %>% 
+  # filter those above $20,000
+  dplyr::filter(earnings > 20000) %>% 
+  dplyr::arrange(quarter) 
+head(uidata_july_outlier) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+These outliers should be compared to the full sample averages which are produced below. 
+
+```{r outlierSummary02, warning = FALSE, message = FALSE, echo = FALSE}
+uidata_july_outlier_sum_by_quarter <-
+uidata1_july %>%
+  group_by(quarter) %>%
+  summarize(avg_earnings = round(mean(earnings, na.rm = TRUE),0),
+         # estimate median earnings
+         median_earnings = round(median(earnings, na.rm = TRUE),0), 
+         # estimate minimum earnings
+         minearn = round(min(earnings, na.rm = TRUE),0), 
+         # estimate maximum earnings
+         maxearn = round(max(earnings, na.rm = TRUE),0), 
+         # estimate top 5 percentile
+         top_five_pct = round(quantile(earnings,probs = 0.95),0),
+         top_one_percent = round(quantile(earnings, probs = 0.99),0)) 
+head(uidata_july_outlier_sum_by_quarter)%>% 
+         flextable::flextable() %>%
+         theme_zebra() %>%
+         autofit()
+```
+
+```{r upperOutlierDetectPerQuarterGroup, warning = FALSE, message = FALSE}
+# Estimating percentages of >$20,000 outliers in the data set
+uidata1_july %>%
+  dplyr::group_by(quarter) %>%
+  mutate(record_count = n()) %>%
+  filter(earnings > 20000) %>%
+  dplyr::summarise(per_quarter = n(),
+                   per_quarter_percentage = round(100 * (per_quarter/record_count),2)) %>%
+  slice(1:1) %>%
+  flextable::flextable() %>%
+  flextable::theme_zebra() %>%
+  autofit()
+```
+
+In the table below, we are looking at low outlier (where program participants earn less than $20). We are not imputing any values to them as the number of observations is insignificant to warrant further investigation with data providers and it is possible that some of them may have earned at those rates. Also they are unlikely to affect averages.
+
+```{r lowerOutlierDetect, warning = FALSE, message = FALSE}
+uidata1_july %>%
+  group_by(quarter) %>%
+  mutate(avg_earnings = mean(earnings, na.rm = TRUE)) %>%
+  filter(earnings < 20) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+```{r lowerOutlierDetectGroup, warning = FALSE, message = FALSE}
+# estimating percentages of the low outliers
+uidata1_july %>%
+  dplyr::group_by(quarter) %>%
+  mutate(record_count = n()) %>%
+  filter(earnings < 20) %>%
+  dplyr::summarise(per_quarter = n(),
+                   per_quarter_percentage = round(100 * (per_quarter/record_count),2)) %>%
+  slice(1:1) %>% 
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+### Outlier Imputation
+
+The code below transforms the file so that it is easier to compare earnings amounts across quarters.
+You can begin to see which observations have earnings in both quarter 1 and quarter 2, only quarter 1 or quarter 2.
+
+```{r wideForOutlierValues, warning = FALSE, message = FALSE}
+# long data file making wide to make it easier to see adjacent values
+uidata1_july_wide <- 
+  uidata1_july %>%
+   # making the file from long to wide
+  pivot_wider(names_from = quarter, values_from = c(earnings), names_prefix = "earnings_")
+theme_zebra(flextable(head(uidata1_july_wide, n = 5))) %>%
+  autofit()
+```
+
+In the table below, we are strictly looking at outlier observations to assess what type of imputation we can do. Do they have more reasonable earning values in neighboring quarters?
+
+```{r checkOutlier, warning = FALSE, message = FALSE}
+uidata1_july_wide_outlier <- 
+uidata1_july_wide %>%
+  dplyr::filter(earnings_Q12017 > 20000 | earnings_Q22017 > 20000 ) # Detecting outliers in both quarters
+head(uidata1_july_wide_outlier) %>%
+  flextable() %>%
+  theme_zebra() %>%
+  autofit()
+# storing the ssns for outliers
+uidata1_july_wide_outlier_ssn <- uidata1_july_wide_outlier$ssn 
+# storing the employerids for outliers
+uidata1_july_wide_outlier_empid <- uidata1_july_wide_outlier$empid 
+```
+
+As mentioned earlier, you may decide to topcode or impute earnings amounts. For this example, we decide to topcode for fringe outliers and impute data using values in another quarter for extreme outliers.
+
+```{r OutlierImputation, warning = FALSE, message = FALSE}
+# Coding note: there is some element of hard coding in the data imputation here. 
+#Eventually more flexible code should be written to generalize from instances. Give it a try!
+# From visual observation, for extreme outliers in Q1, use values from a neighboring quarter
+# For less extreme outliers in Q2, top code
+uidata1_july_wide <-
+uidata1_july_wide %>%
+  # Neighboring quarter imputation
+  dplyr::mutate(earnings_Q12017 = ifelse(earnings_Q12017 > 20000, earnings_Q22017, earnings_Q12017), 
+                # Topcoding
+                earnings_Q22017 = ifelse(earnings_Q22017 > 20000, 20000, earnings_Q22017)) 
+```
+
+In the table, we see that the observations with extreme and fringe outliers have been imputed with either earning values from a neighboring quarter or topcoded at $20,000.We have not removed any records, but the total earnings amounts have been reduced by $1,021,511.
+
+```{r checkOutlierImputation, warning = FALSE, message = FALSE}
+uidata1_july_wide %>%
+  # filtering the outlier ssn and employer id
+  filter(ssn %in% uidata1_july_wide_outlier_ssn & empid %in% uidata1_july_wide_outlier_empid) %>% 
+  # wrapping it in table
+  flextable::flextable() %>% 
+  theme_zebra() %>%
+  autofit()
+```
+
+Below we are converting the wide data to long data again for two reasons.  
+
+* we need to stack the old data file in long format with the current one
+* we are going to look at the distribution of the earnings by quarter in ggplot (visualization library in R). ggplot functions work better with data in 'long' format.
+
+https://librarycarpentry.org/lc-r/04-data-viz-ggplot/index.html
+
+```{r wideToLong, warning = FALSE, message = FALSE}
+# Transforming the data back to long after looking 
+# at in wide format for seeing across quarters
+uidata1_july <-
+  uidata1_july_wide %>%
+  tidyr::pivot_longer(
+    cols = c("earnings_Q12017", "earnings_Q22017"),
+    names_to = "quarter", values_to = "earnings")
+uidata1_july <-
+  # removing the NAs induced from conversion of long to wide and back to long
+  na.omit(uidata1_july) 
+tail(uidata1_july, n = 5) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit() 
+# displaying the first 5 row of the long data set
+```
+
+```{r cleanColumnLong, warning = FALSE, message = FALSE}
+# cleaning column names after transformation from wide to long
+uidata1_july <-
+  uidata1_july %>%
+  mutate(quarter = ifelse(quarter == "earnings_Q22017", "Q22017", "Q12017"))
+```
+
+The box plot below displays the distribution of quarterly earnings amounts after outlier issues have been resolved.
+We still have a right skewed distribution especially for quarter 2 of 2017 with the top coded $20,000 being an outlier albeit a more acceptable and less influential one.
+
+```{r outlierGraph, warning = FALSE, message = FALSE}
+uidata1_july_outlier_graph <-
+  uidata1_july %>% 
+  dplyr::filter(!is.na(earnings)) %>% # removing any missing values
+  ggplot(aes(x = quarter, y = earnings)) +
+  geom_boxplot() + # creating box plots
+  xlab ("Quarters") +
+  ylab ("Earnings") +
+  ggtitle ("Distributions of quarterly earnings amounts") +
+    theme (plot.title = element_text(size = 12,
+                                     face = "bold",
+                                     vjust = 1,
+                                     hjust = 0.5))
+print(uidata1_july_outlier_graph)
+```
+
+
+```{r dropCounter02, warning = FALSE, message = FALSE}
+# Keeping track of all the records that have been dropped throughout the document
+dropRecords <- dim(uidata1_july)[1] - rawJulyRecords
+dropSSNs <- length(unique(uidata1_july$ssn)) - rawJulySSNCounts 
+dropEarnings <- sum(uidata1_july$earnings, na.rm = TRUE) - rawJulyEarnings
+```
+
+### Total quarterly earnings outliers by SSN & Quarter
+
+It is also important to look at quarterly outliers per person (or SSN) – you may have individual earnings records with reasonable amounts, but once the records are summed to the person level the total earnings amount may be very high. This sometimes happens in cases with shared SSNs. Depending on what you find, you may decide to topcode or impute values, or completely remove this person from your file and your analysis.
+
+```{r, warning = FALSE, message = FALSE}
+uidata1_july_per_ssn_quarter <- uidata1_july %>%
+  # flattening the file by ssn and quarter
+  group_by(ssn, quarter) %>% 
+  # number of employers an individual have
+  summarise(numemployers = n(), 
+            total_earnings = sum(earnings, na.rm = TRUE))
+# displaying the first 5 observations
+head(uidata1_july_per_ssn_quarter, n = 5) %>% 
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+Below, we identify a SSN whose earnings are above $20,000 with __11__ employers in one quarter. This seems like a potential shared SSN case.
+
+```{r, warning = FALSE, message = FALSE}
+# Filtering to a ssn earning above 20,000 USD
+uidata1_july_per_ssn_quarter %>%
+  dplyr::filter(total_earnings > 20000) %>%
+  head(., n = nrow(uidata1_july_per_ssn_quarter)) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+Although we identify only one SSN with greater than $20,000 earnings across a high number of employers, we have written code in the next two sections to capture all ssns as well as quarters that would violate our set threshold. We also look at the number of outliers by quarter. If it looks like outliers were all occurring in the same quarter, this could point to a problem with a particular file, or a systematic data extraction error for a particular quarter. This is an example of how you can start to generalize from instances as described above. Can you think of other ways to make this code scaleable?
+
+```{r, warning = FALSE, message = FALSE}
+## pulling out the SSN for > $20,000 USD 11 employers
+outlier_ssn <- 
+  uidata1_july_per_ssn_quarter %>%
+  dplyr::filter(total_earnings > 20000) %>%
+  dplyr::select(ssn)
+outlier_ssn <- as.vector(unlist(outlier_ssn))
+```
+
+```{r, warning = FALSE, message = FALSE}
+## pulling out the quarter for > $20,000 with 11 employers
+outlier_quarter <-
+  uidata1_july_per_ssn_quarter %>%
+  dplyr::filter(total_earnings > 20000) %>%
+  dplyr::select(quarter)
+outlier_quarter <- as.vector(unlist(outlier_quarter))
+
+# looking at the number of outliers by quarter
+uidata1_july_per_ssn_quarter %>%
+  group_by(quarter) %>% 
+  summarise(
+    n_outliers = sum(total_earnings > 20000)) %>% 
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+In the table below, we look at all the observations that share the same SSN, but multiple employers in the same quarter. We suspect that multiple people maybe using the same SSN to work at multiple different places. As this will likely affect future quarters, we decide to remove this SSN altogether from our analysis sample. Note for the table below we would normally round earnings values.
+```{r, warning = FALSE, message = FALSE}
+## pulling out the observations with the ssn for >20,000 USD. 
+# We would recommend rounding the earnings values. Try it!
+uidata1_july %>%
+  filter(quarter %in% outlier_quarter) %>%
+  filter(ssn %in% outlier_ssn) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+
+
+```{r removeOutlierSSN, warning = FALSE, message = FALSE}
+# Removing the outlier SSN altogether from both quarters 
+# (the intent is to remove the SSN altogether from the analysis data set). 
+# We have removed 11 records totaling $40,153 in earnings.
+uidata1_july <-
+  uidata1_july %>%
+  dplyr::filter(ssn != outlier_ssn)
+```
+
+
+### Conservation of Data
+
+As you process administrative data (as we have above), you drop, sum, combine, and transform records. A best practice to ensure that you have not made any errors is to trace the sum of record counts and values (in this case dollars) to make sure that you can account for any drop or increase in counts or sums. We call this "the Law of Conservation of Data" refering to the principal in physics that energy (here data) can be neither be created, nor destroyed (and if it is, we have an error!)
+
+```{r dropCounter03, warning = FALSE, message = FALSE}
+# Keeping track of all the records that 
+# have been dropped throughout the document
+dropRecords <- dim(uidata1_july)[1] - rawJulyRecords
+dropSSNs <-  length(unique(uidata1_july$ssn)) - rawJulySSNCounts 
+dropEarnings <- sum(uidata1_july$earnings, na.rm = TRUE) - rawJulyEarnings
+# Putting them in a list
+procJulyDropSum <- c(dropRecords, dropSSNs, dropEarnings)
+```
+
+```{r processedJulyCounts, warning = FALSE, message= FALSE}
+# Processed July Info
+procJulyCount <- dim(uidata1_july)[1]
+procJulySSNs <- length(unique(uidata1_july$ssn))
+procJulyEarnings <- sum(uidata1_july$earnings, na.rm = TRUE)
+# July Summary Info
+procJulySum <- c(procJulyCount, procJulySSNs, procJulyEarnings)
+```
+
+```{r counterTable01, warning = FALSE, message = FALSE}
+countSum <- data.frame(rawJulyCount = rawJulyCountSum, 
+                               dropJuly = procJulyDropSum, 
+                               procJulyCount = procJulySum)
+row.names(countSum) <- c("recordCounts", "uniqueSSNs", "totalEarnings")
+countSum <- tibble::rownames_to_column(countSum, var = "labels")
+head(countSum) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+
+# UI Updating Step
+
+## Updating overlapping records between April and July files
+
+There may be some changes between files requested at different times due to UI wage data being updated by employers. When receiving multiple data shipments, it is important to request some overlapping data and examine the number of exact duplicates across shipments and the number of updates across shipments. For example, if you find that the overlapping quarters had no exact duplicates or updates, there may be an issue with the employer ID (e.g., the agency sending a state employer ID rather than FEIN). If you find that earnings between two file shipments changed for almost every quarter for individuals, it may be a programming problem (e.g., one quarter of earnings may have been shifted to a different quarter). As a rule, when checking UI data always look at trends by quarter in the number working, the average earnings, the maximum and minimum earnings and the standard deviation. Look for any spikes or drops that can’t be explained by seasonality.  
+
+Sometimes employers experience delays in reporting earnings to the UI agency. One large employer delay in a quarter can affect a caseload. It is important to have a data updating routine that incorporates overlapping quarters on consecutive requests so that as new quarters come in, data can be reconciled. The most common update is a new earnings amount for a quarter that was not previously there (this is more likely if an update is requested within six months as some employers report late). It is also common that earnings amounts can be updated over time. This step examines all of these issues.  
+
+As we have received two batches of UI data for 2017, we will be updating the old one (Q12017) by combining it with the new one (Q12017 (complete) + Q22017), comparing the overlapping records in Q12017, and removing the outdated or less accurate records. 
+
+### Combine the two datasets
+
+```{r newOldStacked, warning = FALSE, message = FALSE}
+# Bind rows for original Q1 data & updated data
+uidata1_april_july <- uidata1_july %>%
+  dplyr::bind_rows(uidata1_april)
+```
+
+After stacking the old data set (Q12017) with the new one (Q12017 (complete) + Q22017), the stacked data has __`r dim(uidata1_april_july)[1]`__ records.
+The unprocessed stacked data have __`r length(unique(uidata1_april_july$ssn))`__ unique SSNs. The total earnings stand at __`r dollar(sum(uidata1_april_july$earnings, na.rm = TRUE),2)`__.
+
+```{r newOldMetaData, warning = FALSE, message = FALSE}
+# using the var.describe meta data function create meta data for each variable (ie a codebook)
+each_var_des <- purrr::map(.x = uidata1_april_july,.f = var.describe, missVals = NULL) 
+# combine meta data of each variable into a single data frame
+all_var_des <- do.call(rbind,each_var_des)
+all_var_des$Variable <- names(uidata1_april_july) 
+all_var_des <-
+all_var_des %>%
+  dplyr::relocate(Variable, .before = NumUnique)
+# create a table in the markdown that is easy to follow for each variable
+flextable::flextable(all_var_des) %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+
+```{r uidata1_july_records_count02, warning = FALSE, message = FALSE}
+# record counts
+rawAprilJulyCounts <- dim(uidata1_april_july)[1]
+print(rawAprilJulyCounts)
+```
+
+```{r uidata1_july_ssn_unique02, warning = FALSE, message = FALSE}
+# identifying number of unique ssn
+rawAprilJulySSNCounts <- length(unique(uidata1_april_july$ssn))
+print(rawAprilJulySSNCounts)
+```
+
+```{r uidata1_july_total_earnings02, warning = FALSE, message = FALSE}
+# calculating total earnings amount
+rawAprilJulyEarnings <- sum(uidata1_april_july$earnings, na.rm = TRUE)
+print(rawAprilJulyEarnings)
+```
+
+```{r rawJulyCountSum02, warning = FALSE, message =  FALSE}
+# saving raw april july records, ssn and earnings for counter table for later on
+rawAprilJulyCountSum <- c(rawAprilJulyCounts, rawAprilJulySSNCounts, rawAprilJulyEarnings)
+```
+
+
+### Filtering SSNs 
+
+As you may recall from the section above, we have removed a SSN with 11 employers as it is impossible for an individual to have that many employers in a single quarter. Due to the likelihood of invalid information based on that particular SSN, we decided to remove the SSN from corresponding quarters as well. Since we are stacking an old data set with the new processed data set, we will have to check to make sure that particular SSN is not on your previously processed dataset. If this were a real-life scenario, this might prompt you to re-examine the potential shared SSN case to make sure it is not the result of a data error on the part of the data provider, rather than additional people using the SSN in the updated file, since it was not flagged as a problem in earlier files. 
+
+In cases like these, code should be written flexibly to account for not just 1 particular SSN, but multiple SSNs as you could have more than 1 SSNs with highly unlikely number of employers.
+
+```{r removingSharedSSN, warning = FALSE, message = FALSE}
+# removing shared SSN
+uidata1_april_july <-
+  uidata1_april_july %>%
+  dplyr::filter(!ssn %in% outlier_ssn) 
+# outlier_ssn is a vector that holds all shared ssn and we are only 
+# having observations without that ssn. 
+# Try to add a message recording how much in earnings was lost when deleting this SSN.
+```
+
+### Check for partial duplicates that differ only by submission date
+
+Below, we identify partial duplicates in which all variables except submission date are the same.There are __`r sum(duplicated(uidata1_april_july[c("ssn", "empid", "quarter", "earnings")]))`__ sets of these types of partial duplicates. For these duplicates, we keep the most recent record and remove the earlier record. 
+
+```{r aprJulyDups01, warning = FALSE, message = FALSE}
+# Checking for partial duplicate: same ssn, empid, quarter, and earnings
+uidata1_april_july_dups <-
+uidata1_april_july %>%
+  # grouping by variables that we expect to be the same
+  dplyr::group_by(ssn, empid, quarter, earnings) %>% 
+  # checking for duplicates by ssn, empid, quarter and earnings
+  dplyr::mutate(dup = n()) %>%
+  # filtering those observations with duplicates
+  dplyr::filter(dup > 1) %>% 
+  # sorting by ssn and empid
+  dplyr::arrange(ssn, empid) 
+# wrapping the output around flextable
+head(uidata1_april_july_dups) %>% 
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Checking for the number of partial duplicates with 
+# same ssn, empid, quarter and earnings with different submission dates
+sum(duplicated(uidata1_april_july[c("ssn", "empid", "quarter", "earnings")]))
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Resolving partial duplicates by keeping the more recent record 
+# (from July) and deleting the older record (from April). 
+# Try to put in a message regarding how many records were 
+# deleted and how much in earnings they account for.
+uidata1_april_july <-
+  uidata1_april_july %>%
+  dplyr::group_by(ssn, empid, quarter, earnings) %>%
+  dplyr::slice(which.max(as.Date(submission_date, '%m/%d/%Y')))
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Resolving partial duplicates by keeping the more 
+# recent record (from July) and deleting the older record (from April)
+sum(duplicated(uidata1_april_july[c("ssn", "empid", "quarter", "earnings")]))
+```
+
+### Check for partial duplicates with different earnings amount and submission date
+
+There may also be some partial duplicates that have different values for both submission date and other columns, due to errors in either file, or updates to the April file. These could include updates to employer IDs, additional or correct earnings amounts, etc. Below we show code to look for the most common type of partial duplicate found when we update files; these are identical on every field except for the earnings amount and submission date. 
+
+Below, we identify partial duplicates where the earnings amount on the July file is different from the earnings amount in the April file. There are __`r sum(duplicated(uidata1_april_july[c("ssn", "empid", "quarter")]))`__ records on the July file that match a record on the April file on most columns, except for the earnings amount. You may decide to keep the higher amount or keep the most recent amount, depending on which method you (or the UI agency) think is the better method. In the example below, we have decided to keep the most recent duplicate record and remove the earlier one.
+
+```{r aprJulyDups02, warning = FALSE, message = FALSE}
+# Checking for partial duplicates
+uidata1_april_july_dups_02 <-
+uidata1_april_july %>%
+  # for observations with same ssn, employer id and quarter
+  dplyr::group_by(ssn, empid, quarter) %>%
+  # checking the number of duplicates
+  dplyr::mutate(dup = n()) %>%
+  # filtering those observations with duplicates
+  dplyr::filter(dup > 1) %>% 
+  # sorting by ssn, employer id, quarter and submission date
+  dplyr::arrange(ssn, empid, quarter, submission_date) 
+head(uidata1_april_july_dups_02, n = nrow(uidata1_april_july_dups_02)) %>%
+  # wrapping everything into a nice table
+  flextable::flextable() %>% 
+  theme_zebra() %>%
+  autofit()
+# saving the ssns with the partial duplicates
+u_partial_dupe_ssn <- unlist(uidata1_april_july_dups_02$ssn) 
+# saving the employer ids with the partial duplicates
+u_partial_dupe_empid <- unlist(uidata1_april_july_dups_02$empid) 
+# saving the quarters with the partial duplicates
+u_partial_dupe_quarter <- unlist(uidata1_april_july_dups_02$quarter) 
+```
+
+```{r, warning = FALSE, message = FALSE}
+## Checking for the number of partial duplicates with 
+# same ssn, empid, quarter with different earnings and submission dates
+sum(duplicated(uidata1_april_july[c("ssn", "empid", "quarter")]))
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Removing partial duplicates for observations with 
+# same ssn, empid and quarter with different earnings and submission dates
+uidata1_april_july <-
+  uidata1_april_july %>%
+  # for observations with same ssn, empid
+  dplyr::group_by(ssn, empid, quarter) %>%  
+   # if earning is not missing, pick the later one
+  dplyr::slice(which.max(as.Date(submission_date, '%m/%d/%Y')))
+```
+
+```{r, warning = FALSE, message = FALSE}
+sum(duplicated(uidata1_april_july[c("ssn", "empid", "quarter")]))
+```
+
+
+The table below examines the __SSNs__ and __employer ids__ for the partial duplicates across earning amounts and different submission dates for the duplicate table above. As you can see, we have successfully removed the earnings from the earlier submission date and kept the most recent one. 
+
+```{r, warning = FALSE, message = FALSE}
+# After deduplication has been done on the partial 
+# duplicates, only the most recent earnings is left
+uidata1_april_july %>%
+  # filering by the quarter &
+  dplyr::filter(quarter %in% u_partial_dupe_quarter) %>% 
+  # ssn and employer ID for the partial duplicates
+  dplyr::filter(ssn %in% u_partial_dupe_ssn & empid %in% u_partial_dupe_empid) %>% 
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+# Final check sums
+
+In this section, we account for all the records that come in as well as those that have been removed to ensure that we have not leaked or inflated the data.
+
+Throughout the document, we have kept a _rudimentary_ tracker for dropped records. See if you can improve upon this! In processing you want to check to ensure that all records and sums are accounted for.
+
+```{r dropCounter05, warning = FALSE, message = FALSE}
+# keeping track of all the records that have 
+# been dropped throughout the document
+dropRecords <- dim(uidata1_april_july)[1] - rawAprilJulyCounts 
+dropSSNs <-  length(unique(uidata1_april_july$ssn)) - rawAprilJulySSNCounts 
+dropEarnings <- sum(uidata1_april_july$earnings, na.rm = TRUE) - rawAprilJulyEarnings
+# putting all the dropped records in a list for data at the end of April and July
+procAprJulyDropSum <- c(dropRecords, dropSSNs, dropEarnings)
+```
+
+```{r processedAprilJulyCounts, warning = FALSE, message= FALSE}
+# final count for april-july stacked data after data is being processed
+procAprJulyCount <- dim(uidata1_april_july)[1] # number of records
+procAprJulySSNs <- length(unique(uidata1_april_july$ssn)) # number of unique ssns
+procAprJulyEarnings <- sum(uidata1_april_july$earnings, na.rm = TRUE) # sum of all the earnings
+# july summary info
+procAprJulySum <- c(procAprJulyCount, procAprJulySSNs, procAprJulyEarnings)
+```
+
+```{r counterTable02, warning = FALSE, message = FALSE}
+# adding the tracked raw, dropped and processed data counts to the table from the previous section
+# comprehensive summary table at the end 
+ # raw AprilJuly stacked data count
+countSum$rawAprilJulyCount <- rawAprilJulyCountSum
+# dropped count for AprilJuly stacked data
+countSum$dropAprilJuly <- procAprJulyDropSum
+# processed AprilJuly stacked data count
+countSum$procAprJulyCount <- procAprJulySum 
+# wrapping everything in flextable for pretty output
+head(countSum) %>% 
+  dplyr::select(rawAprilJulyCount, dropAprilJuly, procAprJulyCount) %>%
+  flextable::flextable() %>%
+  theme_zebra() %>%
+  autofit()
+```
+
+```{r savingCheckedAndStackedData, warning = FALSE, message = FALSE}
+# save the checked and modified data for next stage
+save(uidata1_april_july, file = paste0(savdir1,savfile1))
+```
+
