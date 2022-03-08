@@ -1,5 +1,5 @@
 # Overview of our repository
-This repository contains a series of SQL code programs and one R code program to help administrators and researchers check their UI data, link it with TANF data, and process the data to create employment and earnings outcomes. Like all code, there are many different ways to achieve the same processing step. We show our approach, but it is The code is split up into separate folders:
+This repository contains a series of SQL and R code programs to help administrators and researchers check their UI data, link it with TANF data, and process the data to create employment and earnings outcomes. Like all code, there are many different ways to achieve the same processing step. We show our approach, but it is The code is split up into separate folders:
 * The data_quality_checks folder contains example R code that is commonly used to check whether the UI data you have received looks as expected, and code to address quality issues that might arise. 
 * The create_analysis_file and create_outcomes folders contain SQL code you can use to link and restructure your data, and create common employment and earnings outcomes. These files are prefixed with numbers to indicate the order in which you should follow the code. 
 
