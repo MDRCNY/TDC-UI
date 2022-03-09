@@ -9,7 +9,7 @@ TDC is an initiative of ACF's TANF Data Innovation (TDI) project, launched in la
 The TDC Toolkit was developed through a collaborative process between TDC partners and local TANF agency staff, researchers, and policy experts. The Toolkit builds on decades of experience acquiring, linking, processing, and analyzing UI data and represents a culmination of the joint energy and effort of these many contributors. It addresses a variety of common challenges, from approaching real or perceived legal barriers to data access and establishing a governance structure, to selecting a data linkage method and then analyzing the linked data to produce actionable insights. Further guidance on TANF data-specific topics can be found on [TDC's website](https://www.tanfdata.org/content/tanf-data-model?category%5B%5D=3). 
 
 ## To Use and Contribute to this Repository 
-This repository is publically accessible. All code is provided under the [MIT license](https://github.com/mdrc-cdi/TDC/blob/main/LICENSE).
+This repository is publicly accessible. All code is provided under the [MIT license](https://github.com/mdrc-cdi/TDC/blob/main/LICENSE).
 
 ### Reading the Files
 The simplest way for administrators and researchers to use these resources is to browse this website and download files of interest. Reading sample code and looking at examples of what data may look like can provide new ideas and guide discussion.
