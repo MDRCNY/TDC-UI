@@ -11,17 +11,17 @@ If you’d like to download the files to your environment and work on them witho
 You can also download files individually by navigating to the file and clicking the “Raw” button above the window displaying the file. This will open the file’s raw code. You can then right-click the page and click “Save as” to save the file to your environment. Before opening the raw code, note the file’s extension (as shown in the file path above the window displaying the file in GitHub) as you will have to manually enter the file extension when saving it to your environment.
 
 ### Using the files with Git
-For instructions on how to navigate the GitHub platform and interact with the files through Git, please see the [using_github](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/using_github.md) file included in this folder. 
+For instructions on how to navigate the GitHub platform and interact with the files through Git, please see the [using_github](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/02_using_github.md) file included in this folder. 
 
 ### Using R Markdown
 The data quality checking code is provided in R Markdown. R Markdown is a file format for making dynamic documents with R. An R Markdown document is written in markdown (a plain text format) and contains chunks of embedded R code. This allows you to show your code, output, and any explanatory text you might want in one clean document. See R Studio's guide on getting started here: [R Markdown Introduction](https://rmarkdown.rstudio.com/lesson-1.html)
 
-The [data_quality_checks folder](https://github.com/MDRCNY/TDC-UI/tree/main/02_data_quality_checks) contains a separate instructions file with the steps required to use the files in that particular folder. The folder also includes the full R datasets (.rda files) used in the R markdown files, so you can run the code and output in your own environment.
+The [data_quality_checks](https://github.com/MDRCNY/TDC-UI/tree/main/02_data_quality_checks) folder contains a separate instructions file with the steps required to use the files in that particular folder. The folder also includes the full R datasets (.rda files) used in the R markdown files, so you can run the code and output in your own environment.
 
 ### Using SQL in Jupyter Notebooks
 The SQL code in this repository is provided through Jupyter Notebooks (files with the extension “.ipynb”). Jupyter Notebook is a web-based interactive computing platform by IPython that allows you to integrate multiple coding languages, including Python, SQL, and R., and display both code and output. If you are interested in using Jupyter Notebook, you can download the .ipynb files and run them in your own environment. If you have another preferred platform for SQL code, you can copy and paste the code in the Jupyter Notebooks to your platform of choice and run the code there.
 
-The [create_analysis_file folder](https://github.com/MDRCNY/TDC-UI/tree/main/03_create_analysis_file) contains a separate instructions file with the steps required to use the files in that folder and the subsequent create_outcomes folder. The folder also includes a SQL script to generate the simulated datasets used in the Jupyter Notebook files, so you can run the code and output in your own environment.
+The [create_analysis_file](https://github.com/MDRCNY/TDC-UI/tree/main/03_create_analysis_file) folder contains a separate instructions file with the steps required to use the files in that folder and the subsequent create_outcomes folder. The folder also includes a SQL script to generate the simulated datasets used in the Jupyter Notebook files, so you can run the code and output in your own environment.
 
 See Jupyter's guide on getting started with Jupyter Notebook here: [Try Jupyter](https://docs.jupyter.org/en/latest/start/index.html)
 
@@ -36,7 +36,7 @@ In several of the Jupyter Notebooks, you will find sections that show how to aut
 Jupyter Notebooks, the file type we are using to share this code, does not support dynamic SQL code. The code below therefore produces errors when it is executed within the notebooks. To use this code, you should copy and paste it into your respective SQL Server software.
 
 ## Contributing to the TDC-UI Repository
-We also welcome contributions and feedback. You can use Git’s collaborative functionalities to make your contributions. Please refer to the [using_github](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/using_github.md) file included in this folder for instructions on how to use these functionalities. If you are interested in contributing but are struggling to get started, please contact us. Knowing your questions will help us understand what specific barriers to address.
+We also welcome contributions and feedback. You can use Git’s collaborative functionalities to make your contributions. Please refer to the [using_github](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/02_using_github.md) file included in this folder for instructions on how to use these functionalities. If you are interested in contributing but are struggling to get started, please contact us. Knowing your questions will help us understand what specific barriers to address.
 
 ## Acknowledgements
 The code in this repository was produced by staff at MDRC, specifically Electra Small, Zarni Htet, and Dannia Guzman. Johanna Walter provided a detailed review, and Camille Preel-Dumas, Anumita Jain, and Edith Yang created and managed the TDC-UI wage data repository.
