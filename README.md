@@ -33,7 +33,7 @@ The folders and files within this repository are prefixed with numbers to indica
     - 08 Employment spell measures
     - 09 Employer-based measures
 
-The tdc_resources folder is a separate, standalone location for extra resources on TANF-data specific topics that are referenced in the toolkit.
+The [tdc_resources](https://github.com/MDRCNY/TDC-UI/tree/main/tdc_resources) folder is a separate, standalone location for extra resources on TANF-data specific topics that are referenced in the toolkit.
 
 This repository focuses on preparing UI wage data for analysis. For more information about how to prepare TANF data for analysis, see [the TANF data model developed by Chapin Hall](https://www.chapinhall.org/wp-content/uploads/IB_FSSDC_082917.pdf). 
 
