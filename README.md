@@ -13,8 +13,8 @@ This repository is publicly accessible. All code is provided under the [MIT lice
 The folders and files within this repository are prefixed with numbers to indicate the order we suggest following. Below is an overview of this sequential structure:
 
 0.	**How to use this repository:** general instructions on using the GitHub platform and the code provided. If you are new to this repository, please start here!
-    - Using GitHub online
-    - Using the TDC-UI repository code 
+    - 01 Using the TDC-UI repository code 
+    - 02 Using GitHub online
 1.	**Analysis Context:** a brief explanation on why we might conduct these kinds of analyses
 2.	**Data quality checks:** a walk-through of common data quality issues and ways to address them
     - 00 Instructions
