@@ -14,7 +14,7 @@ The folders and files within this repository are prefixed with numbers to indica
 
 0.	**How to use this repository:** general instructions on using the GitHub platform and the code provided. If you are new to this repository, please start here!
     - 01 Using the TDC-UI repository code 
-    - 02 Using GitHub online
+    - 02 Using GitHub
 1.	**Analysis Context:** a brief explanation on why we might conduct these kinds of analyses
 2.	**Data quality checks:** a walk-through of common data quality issues and ways to address them
     - 00 Instructions
