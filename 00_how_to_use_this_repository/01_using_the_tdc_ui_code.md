@@ -37,8 +37,3 @@ Jupyter Notebooks, the file type we are using to share this code, does not suppo
 
 ## Contributing to the TDC-UI Repository
 We also welcome contributions and feedback. You can use Git’s collaborative functionalities to make your contributions. Please refer to the [02_using_github](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/02_using_github.md) file included in this folder for instructions on how to use these functionalities. If you are interested in contributing but are struggling to get started, please contact us. Knowing your questions will help us understand what specific barriers to address.
-
-## Acknowledgements
-The code in this repository was produced by staff at MDRC, specifically Electra Small, Zarni Htet, and Dannia Guzman. Johanna Walter provided a detailed review, and Camille Preel-Dumas, Anumita Jain, and Edith Yang created and managed the TDC-UI wage data repository.
-
-If you have any questions about the code or other repository materials, please email <> and an MDRC staff member will be able to assist you. 
