@@ -6,8 +6,10 @@ If you’d like to run the code in this folder in your own SQL environment, the 
 
 This SQL script assumes that you have a database called “TDI” in your SQL environment. It will save the datasets in the dbo schema of that TDI database, creating two tables called UI and XRef:
 
+![script_screenshot](script_screenshot.png)
+
 Once you’ve downloaded this SQL script in your environment, you can change these locations and names to whatever works in your environment. After tailoring these locations and names as needed, simply run the script and it will create the datasets. 
-For instructions on how to download the repository files to modify and run the code, please see using_the_tdc_ui_code.
+For instructions on how to download the repository files to modify and run the code, please see [01_using_the_tdc_ui_code](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/01_using_the_tdc_ui_code.md).
 
 ### Running the Jupyter Notebook code programs
 
