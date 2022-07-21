@@ -42,6 +42,9 @@ TDC is an initiative of ACF's TANF Data Innovations (TDI) project, launched in l
 
 The UI Wage Data Toolkit was developed through a collaborative process between TDC partners and local TANF agency staff, researchers, and policy experts. The toolkit builds on decades of experience acquiring, linking, processing, and analyzing UI wage data and represents a culmination of the joint energy and effort of these many contributors. It addresses a variety of common challenges, from approaching real or perceived legal barriers to data access and establishing a governance structure, to selecting a data linkage method and then analyzing the linked data to produce actionable insights.
 
-**Questions? Comments? Contact us at <>.**
+## Acknowledgements
+The code in this repository was produced by staff at MDRC, specifically Electra Small, Zarni Htet, and Dannia Guzman. Johanna Walter provided a detailed review, and Camille Preel-Dumas, Anumita Jain, and Edith Yang created and managed the TDC-UI wage data repository.
+
+If you have any questions about the code or other repository materials, please email <> and an MDRC staff member will be able to assist you. 
 
 ![TDC logo](tdc-logo.png)
