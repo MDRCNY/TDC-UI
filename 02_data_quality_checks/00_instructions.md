@@ -29,7 +29,7 @@ We recommend you put the following files in the same folder before you run them.
 
 ## Ready to Run
 
-At this point, you should be ready to run the code chunks in the markdown. You can run chunk by chunk to play with the code and see what each chunk does. If you want to see a knitted output (i.e Word or PDF or HTML), please click the knit button at the top of the R Studio environment and choose the output you desire.
+At this point, you should be ready to run the code chunks in the markdown. You can run chunk by chunk to play with the code and see what each chunk does. If you want to see a knitted output (i.e Word or PDF or HTML), please click the knit button at the top of the R Studio environment and choose the output you desire. We suggest knitting to HTML since certain tables in the output are quite wide. With HTML, you can widen the window to fit the tables on your screen and/or use the scrolling functionalities embedded in the tables.
 
 
 
