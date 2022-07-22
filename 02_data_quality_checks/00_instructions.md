@@ -18,6 +18,7 @@ The [common_uidata_problems_table](https://github.com/MDRCNY/TDC-UI/blob/main/02
     * install.packages(“janitor”)
     * install.packages(“flextable”)
     * install.packages(“scales”)
+    * install.packages(“naniar”)
 3. Open [01_data_quality_checks.Rmd](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/01_data_quality_checks.Rmd) and change the directory paths to the ones on your machine. We recommend that you create separate subfolders for the original data files and for modified and updated files. Those are at:
     * **Line 67** to read in the custom functions.R
       * Please replace the placeholder text with the directory path where you saved the functions.R file: 
