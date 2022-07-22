@@ -17,15 +17,15 @@ We recommend you put the following files in the same folder before you run them.
     * install.packages(“flextable”)
     * install.packages(“scales”)
 3. Open 01_data_quality_checks.Rmd and change the directory paths to the ones on your machine. We recommend that you create separate subfolders for the original data files and for modified and updated files. Those are at:
-    * **Line 70** to read in the custom functions.R
-      * Please rewrite to insert where you save the file at: 
-        * Source(“yourdirectory/functions.R”)  
-    * **Line 74** to specify where your data files are stored
-      * Please rewrite to insert where you save the files at
-        * usedir <- “/yourdirectory/youroriginaluidata/”
-    * **Line 87** to specify where to save the checked and modified data file at
-      * Please rewrite to insert where you save the files at
-        * savedir1 <- “/yourdirectory/yourupdateduidata/”
+    * **Line 67** to read in the custom functions.R
+      * Please replace the placeholder text with the directory path where you saved the functions.R file: 
+        * source(“/yourdirectory/functions.R”)  
+    * **Line 70** to specify where your data files are stored
+      * Please replace the placeholder text with the directory path where you saved the uidata1_april.rda and uidata1_july.rda files:
+        * usedir <- “/yourdirectory/”
+    * **Line 80** to specify where to save the checked and modified data file
+      * Please replace the placeholder text with the directory path where you want to save the processed file:
+        * savedir1 <- “/yourdirectory/”
 
 ## Ready to Run
 
