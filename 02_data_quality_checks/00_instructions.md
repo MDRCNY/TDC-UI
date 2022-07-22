@@ -22,7 +22,7 @@ We recommend you put the following files in the same folder before you run them.
         * source(“/yourdirectory/functions.R”)  
     * **Line 70** to specify where your data files are stored
       * Please replace the placeholder text with the directory path where you saved the uidata1_april.rda and uidata1_july.rda files:
-        * usedir <- “/yourdirectory/”
+        * usedir1 <- “/yourdirectory/”
     * **Line 80** to specify where to save the checked and modified data file
       * Please replace the placeholder text with the directory path where you want to save the processed file:
         * savedir1 <- “/yourdirectory/”
