@@ -3,10 +3,12 @@
 ## Required Files
 We recommend you put the following files in the same folder before you run them. If you are an intermediate or advanced R user with a different, preferred setup, feel free to use it instead.
 
-  * **01_data_quality_checks.Rmd:** The main R Markdown file with R code that generates a Word Document, Html or PDF. A knitted html output usually looks best, followed by PDF.
-  * **functions.R:** This R script contains code that creates a custom function we can use to produce a summary table. The main R Markdown file (data_quality_checks.Rmd) reads this functions.R file into your environment so you can access the custom function.
-  * **uidata1_april.rda:** This is simulated data representing an older UI dataset you aim to add to and update using a more recent UI dataset.
-  * **uidata1_july.rda:** This is also simulated data, representing the more recent UI dataset you will use to update your records. 
+  * **[01_data_quality_checks.Rmd](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/01_data_quality_checks.Rmd):** The main R Markdown file with R code that generates a Word Document, Html or PDF. A knitted html output usually looks best, followed by PDF.
+  * **[functions.R](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/functions.R):** This R script contains code that creates a custom function we can use to produce a summary table. The main R Markdown file (data_quality_checks.Rmd) reads this functions.R file into your environment so you can access the custom function.
+  * **[uidata1_april.rda](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/uidata1_april.rda):** This is simulated data representing an older UI dataset you aim to add to and update using a more recent UI dataset.
+  * **[uidata1_july.rda](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/uidata1_july.rda):** This is also simulated data, representing the more recent UI dataset you will use to update your records. 
+
+The [common_uidata_problems_table](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/common_uidata_problems_table.pdf) is an additional resource with a summary table of the main data quality issues you might encounter in UI wage data files and how to address them. It is not required to run the code in this folder.
 
 ## Steps to run the files
 
@@ -16,11 +18,11 @@ We recommend you put the following files in the same folder before you run them.
     * install.packages(“janitor”)
     * install.packages(“flextable”)
     * install.packages(“scales”)
-3. Open 01_data_quality_checks.Rmd and change the directory paths to the ones on your machine. We recommend that you create separate subfolders for the original data files and for modified and updated files. Those are at:
+3. Open [01_data_quality_checks.Rmd](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/01_data_quality_checks.Rmd) and change the directory paths to the ones on your machine. We recommend that you create separate subfolders for the original data files and for modified and updated files. Those are at:
     * **Line 67** to read in the custom functions.R
       * Please replace the placeholder text with the directory path where you saved the functions.R file: 
         * source(“/yourdirectory/functions.R”)  
-    * **Line 70** to specify where your data files are stored
+    * **Line 70** to specify where your original data files are stored
       * Please replace the placeholder text with the directory path where you saved the uidata1_april.rda and uidata1_july.rda files:
         * usedir1 <- “/yourdirectory/”
     * **Line 80** to specify where to save the checked and modified data file
