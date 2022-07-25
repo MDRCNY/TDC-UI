@@ -17,7 +17,7 @@ Once you have recreated the simulated data sets in your SQL environment using th
   * 02_link_TANF_UI.ipynb: this code program links the TANF cross-reference file with the UI wage data using SSN 
   * 03_restructure_person_quarter.ipynb: this code program creates your analysis file by summarizing the linked data to one record per person per quarter. This summarized data will be used to create outcomes in the repository folder that follows, called 04_create_outcomes.
 
-To run these notebooks in your own environment, you will need to modify the SQL connection string at the top of each Jupyter Notebook, which currently reads **"mssql+pyodbc://@TDI"**. This string provides the Python driver **(pyodbc)** needed to connect Python and SQL, and also provides information that is specific to the TDC-UI team’s environment, including the SQL Server (in the TDC-UI team’s case, **MSSQL**) and the database where the TDC-UI team’s data is stored **(TDI)**. Replace these string components with your own connection information to route the Jupyter Notebook to your SQL server and database. 
+To run these notebooks in your own environment, you will need to modify the SQL connection string at the top of each Jupyter Notebook, which currently reads **"mssql+pyodbc://@TDI"**. This DSN (Data Source Name) string provides the Python driver **(pyodbc)** needed to connect Python and SQL, and also provides information that is specific to the TDC-UI team’s environment, including the SQL Server (in the TDC-UI team’s case, **MSSQL**) and the database where the TDC-UI team’s data is stored **(TDI)**. Replace these string components with your own DSN connection information to route the Jupyter Notebook to your SQL server and database. 
 
 ### 3. Modifying the code for your work
 
