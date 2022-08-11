@@ -49,7 +49,7 @@ projdesc <-"a project designed to promote better use of TANF and UI data."
 #enter the purpose of the program
 purp1 <-"This program resolves QC issues in a UI wage data file received in July 2017, containing data from Q1 and Q2 of 2017. The program then combines this file with a previously-processed data file from April 2017, which contains incomplete data from Q1 2017. The result is an updated and complete dataset for Q1 and Q2 of 2017."
 purp2 <-"This example uses synthetic UI wage data created for instructional purposes. "
-purp3 <-"Please report any bugs and share any improvements to the TDC-UI repository email contact"
+purp3 <-"Please report any bugs and share any improvements to cdicode@mdrc.org"
 
 #enter first quarter expected, as determined by your UI wage data request
 firstq <-"Q1, 2017"
