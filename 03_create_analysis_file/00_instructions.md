@@ -14,8 +14,8 @@ For instructions on how to download the repository files to modify and run the c
 ### 2. Running the Jupyter Notebook code programs
 
 Once you have recreated the simulated data sets in your SQL environment using the 01_create_simulated_data.sql script, you will be able to run the Jupyter Notebook code files in this folder: 
-  * 02_link_TANF_UI.ipynb: this code program links the TANF cross-reference file with the UI wage data using SSN 
-  * 03_restructure_person_quarter.ipynb: this code program creates your analysis file by summarizing the linked data to one record per person per quarter. This summarized data will be used to create outcomes in the repository folder that follows, called 04_create_outcomes.
+  * [02_link_TANF_UI.ipynb](https://github.com/MDRCNY/TDC-UI/blob/main/03_create_analysis_file/02_link_TANF_UI.ipynb): this code program links the TANF cross-reference file with the UI wage data using SSN 
+  * [03_restructure_person_quarter.ipynb](https://github.com/MDRCNY/TDC-UI/blob/main/03_create_analysis_file/03_restructure_person_quarter.ipynb): this code program creates your analysis file by summarizing the linked data to one record per person per quarter. This summarized data will be used to create outcomes in the repository folder that follows, called 04_create_outcomes.
 
 To run these notebooks in your own environment, you will need to modify the SQL connection string at the top of each Jupyter Notebook, which currently reads **"mssql+pyodbc://@TDI"**. This DSN (Data Source Name) string provides the Python driver **(pyodbc)** needed to connect Python and SQL, and also provides information that is specific to the TDC-UI team’s environment, including the SQL Server (in the TDC-UI team’s case, **MSSQL**) and the database where the TDC-UI team’s data is stored **(TDI)**. Replace these string components with your own DSN connection information to route the Jupyter Notebook to your SQL server and database. 
 
