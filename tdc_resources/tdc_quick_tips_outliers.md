@@ -10,6 +10,6 @@ When you start working with human services data, you will likely find some prett
 
 **What to do.** Other approaches include deleting them (if you know they are wrong), top code them (if you aren't sure), or create simpler measures that count the percent above a value rather than using the original data (for example the percentage of people making over $1,000 a month).
 
-Want to learn more about how to approach data analysis issues like outliers? Consider signing up for the TDC **applied data analytics** course or check out our other tools and resources in the **data analysis section** of our website. There are a range of more advanced statistical approaches that we can point you to if you email us at **info@tanfdata.org**. Please let us know if more content like this would be useful for you.
+Want to learn more about how to approach data analysis issues like outliers? Consider signing up for the TDC **applied data analytics** course or check out our other tools and resources in the **data analysis section** of our website. There are a range of more advanced statistical approaches that we can point you to if you email us at **cdicode@mdrc.org**. Please let us know if more content like this would be useful for you.
 
 ¹Barnett, V. (1978). The study of outliers: purpose and model. *Journal of the Royal Statistical Society: Series C (Applied Statistics), 27(3)*, 242-250.
