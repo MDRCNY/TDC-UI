@@ -1,1 +1,3 @@
+# A Note on the Synthetic Data Used in This Repository 
 
+This repository provides synthetically produced data that you can use to practice and test either the code we’ve provided, or your own code. Because SSNs are the most common individual-level identifier used on UI wage data files, we have generated random 9-digit numbers in our synthetic datasets so that the UI wage data files resemble the structure of an individual-level quarterly wage file that you would typically receive from a state UI agency. We have not used any real wage data to generate SSNs or wage amounts. Any resemblance to real SSNs or real wage amounts are purely coincidental and do not represent data on actual people. Please email cdicode@mdrc.org if you have any questions or concerns. 
