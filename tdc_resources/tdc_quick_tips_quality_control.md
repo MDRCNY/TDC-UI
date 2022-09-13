@@ -8,10 +8,12 @@ So, what can you do to ensure that TANF data are processed correctly? Let's focu
 
 As you restructure data a lot can go wrong. You can double count or under count payments, you can merge to the wrong fields, or filter out the wrong records. Therefore, to ensure quality control in data processing, we suggest a data checking approach called 'input/output checking' which accounts for all records and payments that came in. The approach is simple and might look something like this:
 
-| Total In	| = |	1200 |	$105,440.00 |
+|           |   |       |             |
 |-----------|---|-------|-------------|
-| Total Dropped	| =	| (10)	| ($1,000.00) |
-| Total Out |	=	| 1190 |	$104,440.00 |
+| __Total In__	| __=__ |	__1200__ |	__$105,440.00__ |
+| __Total Dropped__	| __=__	| __(10)__	| __($1,000.00)__ |
+| __Total Out__ |	__=__	| __1190__ |	__$104,440.00__ |
+
 
 Note how the analyst kept track of all records and sums. This simple reconciliation approach has helped us avoid many data processing errors when working with human services data. So, as you move through data processing, keep track of the number of records and the sum of TANF payments so that you can account for why record counts or sums change throughout every step. You look for any leakage or inflation of records or sums. The basic idea is that "data can neither be created nor destroyed" without accounting for where records or sums went. Checks like the ones above can be done in spreadsheets, but it can be more efficient to use structured query language (SQL) which is a topic covered in the **Applied Data Analytics** class.
 
