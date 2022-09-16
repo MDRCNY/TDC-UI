@@ -14,7 +14,7 @@ The folders and files within this repository are prefixed with numbers to indica
 
 0.	**[How to use this repository](https://github.com/MDRCNY/TDC-UI/tree/main/00_how_to_use_this_repository):** general instructions on using the GitHub platform and the code provided. If you are new to this repository, please start here!
     - [01 Using the TDC-UI repository code](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/01_using_the_tdc_ui_code.md) 
-    - [02 Using GitHub](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/02_synthetic_data_notes.md)
+    - [02 A Note on the Synthetic Data Used in This Repository](https://github.com/MDRCNY/TDC-UI/blob/main/00_how_to_use_this_repository/02_synthetic_data_notes.md)
 1.	**[Analysis Context](https://github.com/MDRCNY/TDC-UI/tree/main/01_analysis_context):** a brief explanation on why we might conduct these kinds of analyses
 2.	**[Data quality checks](https://github.com/MDRCNY/TDC-UI/tree/main/02_data_quality_checks):** a walk-through of common data quality issues and ways to address them
     - [00 Instructions](https://github.com/MDRCNY/TDC-UI/blob/main/02_data_quality_checks/00_instructions.md)
