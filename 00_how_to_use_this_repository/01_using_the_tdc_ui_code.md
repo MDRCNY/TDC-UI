@@ -3,7 +3,7 @@
 This page provides overarching instructions on how to use the TDC-UI repository, including how to use the SQL and R code files, how to use the synthetic data, and how to contribute to the repository. The other folders in this repository also include instruction files that are specific to the processing steps covered in that folder.
 
 ## Using the SQL and R code
-The TDC-UI wage data repository contains both SQL and R code. Like all coding, there are different ways to achieve the same processing step. This repository documents the TDC team’s approach, but feel free to experiment with different approaches as well! We encourage you to modify and adapt the code for your own purposes.
+The TDC-UI wage data repository contains both SQL and R code. Like all coding, there are different ways to achieve the same processing step. This repository documents the TDC team’s approach, but feel free to experiment with different approaches as well! We encourage you to modify and adapt the code for your own purposes. If helpful, we have posted an [SQL "cheat sheet"](https://github.com/MDRCNY/TDC-UI/blob/main/tdc_resources/SQL_CheatSheet_CC_License_Link.pdf) with comment SQL syntax in the [resources folder](https://github.com/MDRCNY/TDC-UI/tree/main/tdc_resources).
 
 ### Downloading and using the files without Git
 If you’d like to download the files to your environment and work on them without using Git, the entire repository can easily be downloaded from the [repository home page](https://github.com/MDRCNY/TDC-UI). Click the green “Code” button above the folders and then click the “Download ZIP” button. This will download a ZIP file to your environment with all the repository’s contents.
